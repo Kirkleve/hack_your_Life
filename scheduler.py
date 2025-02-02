@@ -1,12 +1,12 @@
 import schedule
 import asyncio
 from telegram_bot import post_to_telegram
-from interactive import send_poll, send_quiz, send_challenge_day, send_weekly_summary, send_feedback_request
-
+from interactive.tasks import send_poll, send_quiz, send_challenge_day, send_weekly_summary, send_feedback_request
+from logger import log_info
 
 async def run_initial_tasks():
     """✅ Выполняет все задачи при старте проекта с интервалом в 10 секунд"""
-    print("🚀 Выполняем первичный запуск всех задач...")
+    log_info("🚀 Выполняем первичный запуск всех задач...")
 
     await post_to_telegram()
     await asyncio.sleep(10)
@@ -28,7 +28,7 @@ async def run_initial_tasks():
 
     await send_feedback_request()
 
-    print("✅ Первичная проверка завершена. Переход к стандартному расписанию.")
+    log_info("✅ Первичная проверка завершена. Переход к стандартному расписанию.")
 
 
 def schedule_posts():

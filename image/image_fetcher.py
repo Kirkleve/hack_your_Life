@@ -1,4 +1,4 @@
-from image_search import search_image_google, search_image_pexels
+from image.image_search import search_image_google, search_image_pexels
 
 
 def fetch_image(query):

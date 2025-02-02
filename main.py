@@ -1,15 +1,12 @@
 import asyncio
 
-from image_cache import clear_cache
 from scheduler import run_schedule
-from logger import log_info, log_critical  # ✅ Импортируем логирование
+from logger import log_critical  # ✅ Импортируем логирование
 
 
 async def main():
     """🚀 Запускает бота и планировщик в бесконечном цикле с авто-перезапуском"""
-    log_info("🚀 Бот запущен!")
-    clear_cache()
-
+    print("🚀 Бот запущен!")
     while True:
         try:
             asyncio.create_task(run_schedule())

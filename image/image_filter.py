@@ -1,16 +1,16 @@
 import os
-
 import requests
 import imagehash
 import cv2
 import numpy as np
 from PIL import Image
 from io import BytesIO
+from logger import log_info, log_warning, log_error
 
 try:
-    print(f"✅ OpenCV установлен, версия: {cv2.__version__}")
+    log_info(f"✅ OpenCV установлен, версия: {cv2.__version__}")
 except Exception as e:
-    print(f"❌ Ошибка с OpenCV: {e}")
+    log_warning(f"❌ Ошибка с OpenCV: {e}")
 
 
 def get_image_hash(image_url):
@@ -19,10 +19,10 @@ def get_image_hash(image_url):
         response = requests.get(image_url, timeout=10)
         if response.status_code == 200:
             image = Image.open(BytesIO(response.content))
-            print(f"🔄 Проверяем изображение: {image_url}")
+            log_info(f"🔄 Проверяем изображение: {image_url}")
             return str(imagehash.average_hash(image))
     except Exception as e:
-        print(f"Ошибка при обработке изображения: {e}")
+        log_warning(f"Ошибка при обработке изображения: {e}")
     return None
 
 
@@ -42,6 +42,6 @@ def contains_faces(image_url):
             return len(faces) > 0
 
     except Exception as e:
-        print(f"Ошибка при анализе изображения: {e}")
+        log_error(f"Ошибка при анализе изображения: {e}")
 
     return False
