@@ -1,39 +1,51 @@
+import sqlite3
 import os
-import json
 
-# 📂 Теперь кэш хранится в `image/image_cache.json`
-CACHE_FILE = os.path.join(os.path.dirname(__file__), "image_cache.json")
-
-
-def clear_cache():
-    """❌ Удаляет кэш изображений перед перезапуском"""
-    if os.path.exists(CACHE_FILE):
-        os.remove(CACHE_FILE)
-        print("🗑 Кэш изображений очищен!")
+# Путь к базе данных
+DB_PATH = os.path.join(os.path.dirname(__file__), "image_cache.db")
 
 
-def load_cache():
-    """📂 Загружаем кэш изображений"""
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r") as file:
-            return json.load(file)
-    return {}
-
-
-def save_cache(cache):
-    """💾 Сохраняем кэш изображений"""
-    with open(CACHE_FILE, "w") as file:
-        json.dump(cache, file)
+def init_db():
+    """📂 Создаёт таблицу для хранения кэша изображений"""
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS image_cache (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_url TEXT UNIQUE,
+                image_hash TEXT
+            )"""
+        )
+        conn.commit()
 
 
 def is_duplicate(image_url):
-    """🔄 Проверяем, использовалось ли изображение ранее"""
-    cache = load_cache()
-    return image_url in cache
+    """🔍 Проверяет, использовалось ли изображение ранее"""
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1 FROM image_cache WHERE image_url = ?", (image_url,))
+        return cursor.fetchone() is not None
 
 
 def cache_image(image_url, image_hash):
-    """📝 Добавляем изображение в кэш"""
-    cache = load_cache()
-    cache[image_url] = image_hash
-    save_cache(cache)
+    """💾 Добавляет изображение в кэш"""
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT OR IGNORE INTO image_cache (image_url, image_hash) VALUES (?, ?)",
+            (image_url, image_hash),
+        )
+        conn.commit()
+
+
+def clear_cache():
+    """❌ Удаляет все данные из кэша"""
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM image_cache")
+        conn.commit()
+        print("🗑 Кэш изображений очищен!")
+
+
+# Инициализация базы данных при запуске
+init_db()

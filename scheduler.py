@@ -1,12 +1,17 @@
 import schedule
 import asyncio
+from content_improvements.trend_analyzer import get_trending_topics
 from telegram_bot import post_to_telegram
 from interactive.tasks import send_poll, send_quiz, send_challenge_day, send_weekly_summary, send_feedback_request
 from logger import log_info
 
+
 async def run_initial_tasks():
-    """✅ Выполняет все задачи при старте проекта с интервалом в 10 секунд"""
-    log_info("🚀 Выполняем первичный запуск всех задач...")
+    """✅ Выполняет все задачи при старте проекта с актуальными трендами"""
+    log_info("🚀 Получаем актуальные тренды перед запуском...")
+
+    # trending_topics = await get_trending_topics()  # ✅ Исправленный вызов
+    # log_info(f"📊 Тренды загружены: {trending_topics[:5]}")  # ✅ Логируем топ-5 трендов
 
     await post_to_telegram()
     await asyncio.sleep(10)

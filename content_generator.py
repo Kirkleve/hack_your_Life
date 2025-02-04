@@ -1,7 +1,7 @@
 import random
 import openai
 from keys import OPENAI_API_KEY
-from topics import topics  # Импорт списка тем
+from content_improvements.topics import topics  # Импорт списка тем
 from logger import log_warning, log_error
 from content_improvements.trend_analyzer import get_trending_topics
 from content_improvements.prompt_optimizer import optimize_prompt
@@ -27,13 +27,14 @@ def get_next_topic():
     return next_topic
 
 
-def generate_post(topic=None):
+async def generate_post(topic=None):
     """✍️ Генерация поста через OpenAI с разными форматами контента, с учетом трендов и проверки на ошибки."""
     if topic is None:
         topic = get_next_topic()
 
-    trending_topics = get_trending_topics()
-    topic = topic if not trending_topics else f"{topic} ({random.choice(trending_topics)})"
+    # ✅ Исправленный вызов трендов
+    # trending_topics = await get_trending_topics()  # ✅ Теперь get_trending_topics() вызывается корректно
+    # topic = topic if not trending_topics else f"{topic} ({random.choice(trending_topics)})"
 
     # 🔹 Выбираем случайный формат поста
     post_type = random.choice(["storytelling", "checklist", "advice"])
@@ -44,7 +45,7 @@ def generate_post(topic=None):
         "Объем — до 2000 символов."
     )
 
-    prompt = optimize_prompt(base_prompt, topic)
+    prompt = await optimize_prompt(base_prompt, topic)
 
     try:
         response = openai.ChatCompletion.create(

@@ -1,6 +1,8 @@
 TELEGRAM_BOT_TOKEN = "your_key_bot"
 CHAT_ID = "@your_chanel"
 OWNER_USERNAME = "@your_name"  # Имя пользователя владельца канала
+API_ID = "your_telegram_api_id"
+API_HASH = "your_telegram_api_hash"
 
 # API-ключи
 OPENAI_API_KEY = "your_key_openai"

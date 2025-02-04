@@ -1,22 +1,42 @@
-import requests
-from bs4 import BeautifulSoup
+from telethon import TelegramClient
+from logger import log_error, log_info
+from keys import API_ID, API_HASH  # 🔑 Импортируем API
+from content_improvements.trend_channels import TREND_CHANNELS  # 🔍 Импортируем список каналов
 
-# Ключевые слова, по которым определяем нужные нам тренды
+
+SESSION_FILE = "trend_analyzer_session"  # ✅ Файл сессии Telegram
+
+# ✅ Создаём клиент Telegram, который будет использовать сохранённую сессию
+client = TelegramClient(SESSION_FILE, API_ID, API_HASH)
+
 ALLOWED_KEYWORDS = ["здоровье", "спорт", "продуктивность", "мотивация", "биохакинг", "энергия", "сон", "цели"]
 
 
-def get_trending_topics():
-    """📊 Парсер популярных тем из Telegram-каналов (оставляет только темы по нашей тематике)."""
-    url = "https://tlgrm.ru/channels/popular"
-    response = requests.get(url, timeout=10)
+async def get_trending_topics():
+    """📊 Получает популярные темы из Telegram-каналов (и использует сохранённую сессию)"""
+    trending_topics = []
 
-    if response.status_code != 200:
-        return []
+    try:
+        async with client:
+            log_info("✅ Подключено к Telegram API через сохранённую сессию!")
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    topics = [item.text for item in soup.select(".channel-item-title")]
+            for channel in TREND_CHANNELS:
+                try:
+                    async for message in client.iter_messages(channel, limit=30):
+                        if message.message:
+                            text = message.message.lower()
+                            reactions = message.reactions
+                            if reactions and any(kw in text for kw in ALLOWED_KEYWORDS):
+                                topic = text[:50]  # Обрезаем до 50 символов для краткости
+                                trending_topics.append((topic, sum(reaction.count for reaction in reactions.reactions)))
 
-    # ❌ Отбрасываем нерелевантные темы
-    filtered_topics = [topic for topic in topics if any(keyword in topic.lower() for keyword in ALLOWED_KEYWORDS)]
+                except Exception as e:
+                    log_error(f"Ошибка при получении трендов с {channel}: {e}")
 
-    return filtered_topics[:10]  # Берём только 10 самых релевантных тем
+        # Сортируем по популярности
+        trending_topics.sort(key=lambda x: x[1], reverse=True)
+        return [t[0] for t in trending_topics[:10]]
+
+    except Exception as e:
+        log_error(f"❌ Ошибка подключения к Telegram API: {e}")
+        return []  # Возвращаем пустой список, чтобы избежать ошибок

@@ -2,7 +2,7 @@ import json
 import datetime
 import random
 from keys import reaction_data_file
-from topics import topics  # Импорт списка тем
+from content_improvements.topics import topics  # Импорт списка тем
 
 MIN_REACTIONS = 50  # Минимальное количество реакций для анализа популярности
 REPLACE_THRESHOLD = 10  # Если тема 3 раза подряд набирает < 10 лайков — она удаляется

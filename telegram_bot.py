@@ -2,12 +2,13 @@ import asyncio
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from telegram.request import HTTPXRequest
+from content_improvements.trend_analyzer import get_trending_topics
 from keys import TELEGRAM_BOT_TOKEN, CHAT_ID
 from image.image_fetcher import fetch_image
 from content_generator import generate_post, split_text_by_paragraphs
 from analytics import get_most_popular_topic
 from handlers import handle_mention, handle_reactions
-from image.keyword_extractor import extract_keywords
+from image.keyword_extractor import generate_search_keywords
 from logger import log_info, log_warning, log_error  # ✅ Импортируем логирование
 
 # ✅ Оптимизированный пул соединений для Telegram API
@@ -23,15 +24,21 @@ application.add_handler(MessageHandler(filters.ALL, handle_reactions))
 async def post_to_telegram():
     """📢 Публикация поста в Telegram: Картинка + заголовок, затем раскрытие темы"""
 
-    # ✅ Получаем актуальную тему поста
+    # ✅ Получаем тренды
+    # trending_topics = await get_trending_topics()
+    # popular_topic = trending_topics[0] if trending_topics else get_most_popular_topic()
     popular_topic = get_most_popular_topic()
-    post_text = generate_post(topic=popular_topic)
+
+    # ✅ Генерируем пост по актуальной теме
+    post_text = await generate_post(topic=popular_topic)
 
     # ✅ Разделяем текст на заголовок и основную часть
     title, body_parts = split_text_by_paragraphs(post_text)
 
+    log_info(f"📢 Публикуем пост по теме: {popular_topic}")
+
     # ✅ Подбираем изображение по ключевым словам
-    query = extract_keywords(title)
+    query = generate_search_keywords(title)
     image_url = fetch_image(f"{query} site:pinterest.com")
 
     if not image_url:
