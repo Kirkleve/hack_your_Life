@@ -2,10 +2,11 @@ import asyncio
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from telegram.request import HTTPXRequest
-from content_improvements.trend_analyzer import get_trending_topics
+
+from content_generation.content_generator import generate_post
+# from content_improvements.trend_analyzer import get_trending_topics
 from keys import TELEGRAM_BOT_TOKEN, CHAT_ID
 from image.image_fetcher import fetch_image
-from content_generator import generate_post, split_text_by_paragraphs
 from analytics import get_most_popular_topic
 from handlers import handle_mention, handle_reactions
 from image.keyword_extractor import generate_search_keywords
@@ -30,10 +31,7 @@ async def post_to_telegram():
     popular_topic = get_most_popular_topic()
 
     # ✅ Генерируем пост по актуальной теме
-    post_text = await generate_post(topic=popular_topic)
-
-    # ✅ Разделяем текст на заголовок и основную часть
-    title, body_parts = split_text_by_paragraphs(post_text)
+    title, body_parts = await generate_post(topic=popular_topic)
 
     log_info(f"📢 Публикуем пост по теме: {popular_topic}")
 

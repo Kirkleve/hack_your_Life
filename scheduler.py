@@ -13,23 +13,23 @@ async def run_initial_tasks():
     # trending_topics = await get_trending_topics()  # ✅ Исправленный вызов
     # log_info(f"📊 Тренды загружены: {trending_topics[:5]}")  # ✅ Логируем топ-5 трендов
 
-    await post_to_telegram()
-    await asyncio.sleep(10)
+    #await post_to_telegram()
+    #await asyncio.sleep(10)
 
-    await send_poll()
-    await asyncio.sleep(10)
+    #await send_poll()
+    #await asyncio.sleep(10)
 
-    await post_to_telegram()
-    await asyncio.sleep(10)
+    #await post_to_telegram()
+    #await asyncio.sleep(10)
 
-    await send_quiz()
-    await asyncio.sleep(10)
+    #await send_quiz()
+    #await asyncio.sleep(10)
 
     await send_challenge_day()
     await asyncio.sleep(10)
 
-    await send_weekly_summary()
-    await asyncio.sleep(10)
+    #await send_weekly_summary()
+    #await asyncio.sleep(10)
 
     await send_feedback_request()
 
