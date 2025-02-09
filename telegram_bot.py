@@ -1,8 +1,17 @@
+"""
+Файл отвечает за публикацию постов в Telegram-канале.
+
+🔹 Генерация постов: Получает текст поста через OpenAI и форматирует его.
+🔹 Подбор изображения: Ищет изображение по теме поста (Google, Pexels, Pinterest).
+🔹 Публикация в Telegram: Отправляет изображение с заголовком, затем текст поста.
+🔹 Обработка ошибок: Перезапускает отправку при сбоях API (например, Pool Timeout).
+🔹 Логирование: Фиксирует успешные публикации и возможные ошибки.
+"""
+
 import asyncio
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from telegram.request import HTTPXRequest
-
 from content_generation.content_generator import generate_post
 # from content_improvements.trend_analyzer import get_trending_topics
 from keys import TELEGRAM_BOT_TOKEN, CHAT_ID
@@ -20,6 +29,7 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN, request=request)
 application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_mention))
 application.add_handler(MessageHandler(filters.ALL, handle_reactions))
+
 
 
 async def post_to_telegram():

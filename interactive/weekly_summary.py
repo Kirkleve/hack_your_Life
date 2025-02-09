@@ -7,6 +7,7 @@ from logger import log_error
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
+
 async def send_weekly_summary():
     """📅 Подведение итогов недели с анализом активности подписчиков"""
     reaction_data = load_reaction_data()
